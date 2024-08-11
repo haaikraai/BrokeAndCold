@@ -1,0 +1,115 @@
+@media screen and (max-width: 600px) {
+    .container {
+        /* align-items: center; */
+        width: 90%;
+        /* very specific for my phone */
+        width:  300px;
+        margin: auto;
+        border: 4px groove lightgrey;
+        padding: 4px;
+        /* flex-basis: 70%; */
+    }
+}
+
+.content-row {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    /* flex-basis: 50%; */
+    margin: auto;
+    width: 70%;
+    border: 3px dashed green;
+    padding: 4px;
+    /* margin: 10px;  */
+}
+.textline {
+    border: 2px dashed red;
+    /* flex-basis: 100%; */
+    font-size: 1.2em;
+    color: #333;
+    margin: 3px;
+    padding: 3px;
+}
+
+.button-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    height: 4.4em;
+    align-items: stretch;
+    /* align-content: center; */
+    /* text-align: center; */
+    vertical-align: middle;
+}
+
+.better-button {
+    flex-basis: 50%;
+    /* width: 40%; */
+    
+    background-color: rgb(83, 142, 142);
+    border: 9px ridge darkslategray;
+    flex-grow: 0;
+    flex-shrink: 1;
+    /* margin: 0px;     */
+}
+
+.better-button:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+}
+/* animate .better-button click event */
+.better-button:active {
+    /* change color to look different on click */
+    /* background-color: rgb(142, 83, 83); */
+    transform: scale(0.9);
+    transition: transform 0.2s ease-in;
+    color: rgb(132, 255, 255);
+    background-color: rgb(37, 67, 67);
+    border: 9px ridge rgb(0, 0, 0);
+    flex-grow: 0;
+    flex-shrink: 1;
+    /* margin: 0px;     */
+}
+
+.sign-text {
+    font-size: 2.4em;
+    font-weight: bold;
+}
+
+.nosign-text {
+    font-size: medium;
+}
+
+.settings-icon {
+    color: white;
+    background:rgb(37, 67, 67);
+}
+
+.settings-form {
+    /* display: grid;
+    grid-template-columns: 50px 200px 50px; */
+    /* flex-direction: row; */
+    /* justify-content: space-around;    */
+    /* align-items: end; */
+    /* width: 330px; */
+    /* gap: 6px; */
+}
+
+.entry-row {
+    display: grid;
+    /* note last columns is empty spans to center the fucking thing */
+    grid-template-columns: 200px 50px 150px;
+
+    /* width: 200px; */
+    border: 1px dashed red;
+    /* width: 250px; */
+    text-align: right;
+}
+
+.numberbox {
+    /* justify-self: flex-end; */
+    /* align-self: flex-end; */
+    width: 50px;
+    margin: 5px;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broke And Cold Settings</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script type="module" src="./js/settings.mjs"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Inserting the SVG back icon -->
+        <button type="button" onclick="window.location.href='./index.html'">
+            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <!-- Replace the path attribute value with the actual path data of your SVG -->
+                <path d="M12 2L4.5 9.5L10.5 2" stroke="#000" stroke-width="2" fill="none" />
+            </svg>
+        </button>
+
+        <div class="content-row">
+            <div class="textline">
+                Welcome to settings
+            </div>
+            <div class="settings-form">
+
+                <div class="entry-row">
+                    
+                    <label for="balanceAmt">Balance: </label>
+                    <input class="numberbox" id="balanceAmt"
+                        type="number">
+                        <span></span>
+                </div>
+                <div class="entry-row">
+                    
+                    <label for="dailyAmt">Daily Change: </label><input class="numberbox" id="dailyAmt" type="number">
+                    <span></span>
+                </div>
+                <div class="entry-row">
+                    
+                    <label for="increaseAmt">Increase Amount: </label><input class="numberbox" id="increaseAmt"
+                        type="number">
+                        <span></span>
+                </div>
+                <div class="entry-row">
+                    
+                    <label for="decreaseAmt">Decrease Amount: </label><input class="numberbox" id="decreaseAmt"
+                        type="number">
+                        <span></span>
+                </div>
+                <div class="entry-row">
+                    
+                    <label for="lastDate">Last Date to Save: </label><input class="numberbox" id="date"
+                        type="date">
+                        <span></span>
+                </div>ss
+            </div>
+        </div>
+
+    </div>
+    
+</body>
+
+</html>
