@@ -19,11 +19,22 @@
 
 // Wait for the deviceready event before using any of Cordova's device APIs.
 // See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
+import { debugAction } from './beanService.mjs';
+const bs = await import('./beanService.mjs');
+
+
 document.addEventListener('deviceready', onDeviceReady, false);
+document.addEventListener('pause', ()=> {
+    bs.beanService.saveBalance();
+    debugAction.textContent = 'Paused after saving';
+}, false);
+document.addEventListener('resume', ()=> {
+    bs.beanService.loadBalance();
+    debugAction.textContent = 'Resumed after loading';
+}, false);
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
 
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');}
-

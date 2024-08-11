@@ -8,11 +8,11 @@ console.log(balance);
 console.log('in settings');
 
 let balanceData = {
-    balance: -259,
-    date: new Date('2024-07-26'),
+    balance: -111,
+    date: new Date('2024-08-01'),
     incAmount: 100,
     decAmount: 50,
-    dailyAmount: 10
+    dailyAmount: 200
 }
 
 function debug() {
@@ -22,12 +22,13 @@ function debug() {
     
     setTimeout(() => {
         loadBalance();
+        console.log(balanceData);
     }, 2000)
 }
 
 debug();
 
-console.log(balanceData);
+
 
 function saveBalance() {
     console.log('saving settings');
@@ -36,6 +37,7 @@ function saveBalance() {
     balanceData.incAmount = parseInt(increase.value);
     balanceData.decAmount = parseInt(decrease.value);
     balanceData.date = new Date(date.value).getTime();
+    console.log('Data to save:');
     // balanceData.date = new Date(Date.now()).getTime();
     const data = JSON.stringify(balanceData);
     console.log(data);
@@ -59,4 +61,7 @@ function loadBalance() {
 
 // document.addEventListener('DOMContentLoaded', loadBalance);
 // save whenever input box loses focus
-document.addEventListener('focusout', saveBalance);
+document.addEventListener('focusout', () => {
+    console.log('lost focus');
+    saveBalance();
+}, false);

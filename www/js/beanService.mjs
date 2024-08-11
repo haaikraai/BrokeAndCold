@@ -1,26 +1,9 @@
 // document.addEventListener('DOMContentLoaded', function() {};
 console.log('beanService.mjs');
 
-const debugAction = document.getElementById('action');
-const lastDate = document.getElementById('lastDate');
+export const debugAction = document.getElementById('action');
+export const lastDate = document.getElementById('lastDate');
 
-// const bod = document.getElementsByTagName('body')
-// document.body.style.backgroundColor = 'rgb(41,15,84)';
-
-
-// function registerServiceworker() {
-//     if ('serviceWorker' in navigator) {
-//         navigator.serviceWorker.register('./sw.js')
-//         .then(reg => {
-//             console.log('Service worker registered');
-//         })
-//         .catch(err => {
-//             console.log('Service worker not registered', err);
-//         });
-//     }
-// }
-
-// registerServiceworker();
 /**
  * @class BeanService
  */
@@ -162,7 +145,7 @@ class BeanService {
     }
 }
 
-const beanService = new BeanService();
+export const beanService = new BeanService();
 
 document.getElementById('plus').addEventListener('click', ()=> {
     beanService.increment();
@@ -180,17 +163,6 @@ document.getElementById('load').addEventListener('click', () => {
     
     beanService.loadBalance();
 });
-
-document.addEventListener('pause', () => {
-    debugAction.textContent = 'Pausing';
-    beanService.saveBalance();
-}, false);
-
-document.addEventListener('resume', () => {
-    debugAction.textContent = 'Resuming';
-    beanService.loadBalance();
-}, false);
-
 
 // console.log('beanService', beanService);
 
