@@ -1,0 +1,4 @@
+TODO:
+
+1. Double save in case of mistake
+2. IndexDB history log

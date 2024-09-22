@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Broke And Cold History Ledger</title>
+        <link rel="stylesheet" href="./css/style.css" />
+        <script type="module" src="./js/history.mjs"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            <!-- Inserting the SVG back icon -->
+            <div class="top-buttons">
+                <button type="button" onclick="window.history.back()">
+                    <img src="/img/back.svg">
+                </button>
+            </div>
+
+            <div id="ledgerhistory">
+                <div class="ledgercell"></div>
+            </div>
+        </div>
+    </body>
+</html>

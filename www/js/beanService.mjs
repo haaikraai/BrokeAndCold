@@ -1,24 +1,39 @@
 // document.addEventListener('DOMContentLoaded', function() {};
 console.log('beanService.mjs');
 
-export const debugAction = document.getElementById('action');
-export const lastDate = document.getElementById('lastDate');
+const debugAction = document.getElementById('action');
+const lastDate = document.getElementById('lastDate');
 
+let logEntryTemplate =
+{
+    date: new Date(),
+    tags: [],
+    amount: 0
+}
 /**
+ * 
  * @class BeanService
  */
 class BeanService {
     /**
      * @type {Object}
      * @desciption current balance and settings as a json object
-     */
+    */
     balanceData = {
-        balance: -259,
-        date: new Date('2024-07-26'),
+        balance: 0,
+        date: new Date('2024-09-16'),
         incAmount: 100,
-        decAmount: 50,
-        dailyAmount: 10
+        decAmount: -25,
+        dailyAmount: 250
     }
+
+    logData = [
+        {
+            date: new Date(),
+            tags: [],
+            amount: 0
+        }]
+
 
     /**
      * @type {number}
@@ -26,77 +41,100 @@ class BeanService {
      * @private
      * @description current balance
      */
-    balance = -4;
+    balance = 1;
 
     // A flag determining whether a button was recently clicked. This is used to allow multiple clicks to be registered and agglomerated as one total transaction
 
-    recentCall = false;
 
+    // timeBeforeNewTransaction = 3500;
+    timeBeforeNewTransaction = 18500;
+    runningTotal = -99;
     // VERY fine tuning: the milliseconds to elapse before allowing a click to be registered to a new transaction
+    clickTimer;
+    ledger = new ledgerBook();
 
-    timeBeforeNewTransaction = 3500;
+    testButton = document.querySelector('#testButton')
 
     constructor() {
+
         console.log('BeanService constructor');
         console.log(this.balanceData);
-        this.balance = this.balanceData.balance;        
+        this.balance = this.balanceData.balance;
         this.updateBalance();
         console.log('balance', this.balance);
-
         
+       
+        this.clickTimer = new eventTimer(this.timeBeforeNewTransaction, () => {
+            console.log('should display cordially that amount added was: ' + this.runningTotal);
+            this.updateBalance();
+        });
+
+        this.testButton.addEventListener('click', () => {
+            console.log(this.ledger);
+            this.ledger.renderLedger(2);
+        })
+
+
+
         debugAction.textContent = 'Will update in 6s\t' + this.balance.toString();
         lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
-        setTimeout(() => {
-            this.loadBalance();
-            this.updateDate();
-            this.updateBalance();
-            // debugAction.textContent = 'Updated balance from saved file';
-            
-            setTimeout(() => {
-                this.saveBalance();
-            }, 2000)
-            
-        }, 6000)
+
+        this.loadBalance();
+        this.updateDate();
+        this.updateBalance();
+        // debugAction.textContent = 'Updated balance from saved file';
+
+        this.saveBalance();
+
     }
 
     increment() {
         console.log(this);
         console.log('BeanService increment');
         // console.log(this.balanceData);
-        this.balance += this.balanceData.incAmount;
-        this.updateBalance();
+        this.runningTotal += this.balanceData.incAmount;
     }
 
     decrement() {
         console.log('BeanService decrement');
-        this.balance -= this.balanceData.decAmount;
-        this.updateBalance();
+        // this.balance -= this.balanceData.decAmount;
+        console.log(this.balanceData.decAmount);
+        this.runningTotal += this.balanceData.decAmount;
     }
 
     updateBalance() {
+        this.balance += this.runningTotal;
         const balanceTag = document.getElementById('balnace');
         balanceTag.textContent = this.balance;
+        debugAction.innerText = 'Updated balance by: ' + this.runningTotal;
+        this.runningTotal = 0;
     }
 
-    saveBalance() {
+    saveBalance(msg) {
         console.log('BeanService saveBalance');
         console.log('Saving: ', this.balance);
         this.balanceData.balance = this.balance;
         this.balanceData.date = new Date(Date.now()).getTime();
         const data = JSON.stringify(this.balanceData);
         console.log(data);
-        window.localStorage.setItem('balance', this.balance);
+        // window.localStorage.setItem('balance', this.balance);
         window.localStorage.setItem('data', data);
+        logEntryTemplate.amount = this.balance;
+        logEntryTemplate.date = Date.now();
 
+        this.logData.push(logEntryTemplate);
         
-        debugAction.textContent = 'Saved balance';
+
+
+        debugAction.textContent = 'Saved balance' + msg;
         lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
-        
+
     }
 
     loadBalance() {
         console.log('BeanService loadBalance');
-        this.balanceData = JSON.parse(window.localStorage.getItem('data'));
+        const parsedData = JSON.parse(window.localStorage.getItem('data'));
+        if (parsedData) this.balanceData = parsedData;
         this.balance = this.balanceData.balance;
         console.log('Loaded: ', this.balanceData);
         this.updateBalance();
@@ -105,14 +143,47 @@ class BeanService {
         lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
     }
 
+    /*
+    Compares last saved date to now. Adds the dailyAmount * (difference in days) to the balance.
+    ADDITIONALLY: if the date is a new day, it saves an extra copy to "backup"
+    */
     updateDate() {
-        console.log('BeanService updateDate');
+        console.log('BeanService pay daily allowances');
         // no, only update date when saving
         // const today = new Date();
-        const today = new Date(Date.now());
+        const today = new Date();
         const loadedDate = new Date(this.balanceData.date);
-        let daysPassed = 0;
+        
+        // get time difference between now and last saved in milliseconds, hours, days.
+        const deltaTime = today.getTime() - loadedDate.getTime();
+        const deltaHours = Math.floor(deltaTime / 1000/60/60);
+        const deltaDays = Math.floor(deltaHours / 24);
+        
+        
 
+        // SAVE backup if more than 24 hours passed:
+        if (deltaHours >= 24) {
+            window.localStorage.setItem('backup', window.localStorage.getItem('data'));
+        }
+
+        // use already calculated days ellapsed to get new balance
+        // Math.floor - do not want fractional salaries
+        
+        const bal = this.balanceData.balance + deltaDays * this.balanceData.dailyAmount;
+        console.log(`added income to bal. Total: ${bal} - for ${deltaDays} days ellapsed`);
+        this.balanceData.balance = bal;
+        this.balanceData.date = today;
+        this.balance = bal;
+
+        debugAction.textContent = `Updated date with ${deltaDays} days`;
+        lastDate.textContent = new Date(this.balanceData.date).toDateString();
+    }
+    
+    /*
+    Old version calculation per constraints. New version just gets millisecond difference, calculates day difference from it and done.
+    */
+    updateDate_old_version() {
+        // do the math for two dates in the same month
         if (today.getMonth() === loadedDate.getMonth()) {
             console.log('Same month indeed')
             daysPassed = today.getDate() - loadedDate.getDate();
@@ -120,16 +191,18 @@ class BeanService {
             console.log('bal', bal);
             this.balanceData.balance = bal;
             this.balance = bal;
-        } 
+        }
+
+        // do more complex math for two dates in different months. This is stupid, should just do the complex math.
         if (today.getMonth() !== loadedDate.getMonth()) {
             console.log('Different month');
-            if (today.getFullYear() !== this.balanceData.date.getFullYear()) {
+            if (today.getFullYear() !== loadedDate.getFullYear()) {
                 alert('Whole year passed!\nDo your own math');
             } else {
                 // Get the difference in days between today and the last date
                 // Multiply the difference by the daily amount
-                
-                daysPassed = Math.floor((today.getTime() - this.balanceData.date.getTime()) / (1000 * 60 * 60 * 24));
+
+                daysPassed = Math.floor((today.getTime() - loadedDate.getTime()) / (1000 * 60 * 60 * 24));
                 const bal = this.balanceData.balance + daysPassed * this.balanceData.dailyAmount;
                 console.log('added income to bal. Total: ', bal);
                 this.balanceData.balance = bal;
@@ -145,24 +218,142 @@ class BeanService {
     }
 }
 
-export const beanService = new BeanService();
 
-document.getElementById('plus').addEventListener('click', ()=> {
-    beanService.increment();
-    // console.log('plussed');
-    // console.log(beanService);
-});
-document.getElementById('minus').addEventListener('click', () => {
-    beanService.decrement();
-});
+/*
+This one. This classs checks if a double or triple or infinetuple click happened.
+It has a time threshold. If the time ellapsed time between clicks is larger than the threshold, it is concidered a new cluster of clicks.
+It has its own internal timer state.
+It returns a integer as the state of the received. Possible return values are:
+1 - symbolising the first click for a new set of clusters
+0 - symbolising a click in the same cluster
 
-document.getElementById('save').addEventListener('click', () => {
+Guide:
+create class with an event as constructer parameter ===? maybe bad idea.
+
+Notes:
+I had to o make this a class to keep an internal state to track the cluster and time. Surely there is a simpler, functional way.
+This is currently for mouse clicks. But it can be applied and extended for any event and any timeframe. 
+It doesn't even have to be time, it can be for a http post event that streams chunks, where it sends if the size of two adjacent chunks differs by a certain size. Shite example.
+*/
+class eventTimer {
+    recentClick = false;
+    recentThreshold = 14000;
+    activeTimer;
+    callBack;
+
+    constructor(threshold, runAfterTimeout) {
+        this.recentThreshold = threshold;
+        this.callBack = runAfterTimeout;
+    }
+
+    onClick(debugMsg) {
+        console.log(debugMsg);
+        const recentClick = this.recentClick;
+        console.log('click noted. Currently have: ' + recentClick);
+        console.log(this.activeTimer);
+
+        if (recentClick == false) {
+            this.startTimer();
+            return (recentClick);
+        }
+
+        if (recentClick == true) {
+            clearTimeout(this.activeTimer);
+            this.startTimer();
+            return (recentClick);
+        }
+
+        console.log("event happened. Starting or restarting timer");
+
+    }
+
+    startTimer() {
+        console.log('Starting timer');
+        this.recentClick = true;
+        this.activeTimer = setTimeout(() => {
+            console.log('class timer is done');
+            this.recentClick = false;
+            this.callBack();
+        }, this.recentThreshold);
+    }
+}
+
+
+class ledgerBook {
+    ledgerData = [
+        {
+            date: new Date('07-15-2025'),
+            tags: ['some','stuff'],
+            amount: 690
+        },
+        {
+            date: new Date('09-01-2025'),
+            tags: ['less','stuff'],
+            amount: 90
+        }
+    ]
+
+    constuctor() {}
+
+
+    renderLedger(maxitems = 2) {
+        // make max larger when you have actual items
+        console.log('rendering');
+        const entrypoint = document.querySelector('#ledgerhistory');
+
+        for (let i = this.ledgerData.length - 1; i >= this.ledgerData.length - maxitems; i--) 
+        {
+            console.log(i);
+            const entry = this.ledgerData[i];
+            console.log(entry)
+
+            // double divving?
+            const entryHtml = `
+            <div id="ledgerrow">
+                <span class="ledgercell datecell" id="date">${entry.date.toLocaleString()}</span>
+                <span class="ledgercell" id="tags">${entry.tags.toString()}</span>
+                <span class="ledgercell amountcell" id="amount">${entry.amount}</span>
+            </div>`
+
+            entrypoint.insertAdjacentHTML("beforeend",entryHtml);
+
+
+        }
+    }
+
+
+}
+
+
+export const beanService  = new BeanService();
+
+function onLoad() {
+    console.log('in onload');
+    document.addEventListener("deviceready", onDeviceReady, false);
+}
+
+// device APIs are available
+//
+
+function onDeviceReady() {
+    document.addEventListener("pause", onPause, false);
+    document.addEventListener("resume", onResume, false);
+    beanService.renderLedger();
+    // document.addEventListener("menubutton", onMenuKeyDown, false);
+    // Add similar listeners for other events
+}
+
+
+
+function onPause(e) {
     beanService.saveBalance();
-});
-document.getElementById('load').addEventListener('click', () => {
-    
+    debugAction.innerText = "Did save before pause";
+}
+
+function onResume(e) {
     beanService.loadBalance();
-});
+    debugAction.innerText = "Did load before resuming";
+}
 
 // console.log('beanService', beanService);
 
@@ -173,3 +364,79 @@ document.getElementById('load').addEventListener('click', () => {
 // function decrement() {
 //     console.log('decrement');
 // }
+
+
+
+
+
+
+document.getElementById('plus').addEventListener('click', () => {
+    console.log('plussed');
+    beanService.increment();
+    console.log(beanService.clickTimer.onClick());
+    console.log('Running total: ' + beanService.runningTotal);
+    // console.log('plussed');
+    // console.log(beanService);
+}, false);
+
+document.getElementById('minus').addEventListener('click', () => {
+    beanService.decrement();
+    console.log(beanService.clickTimer.onClick());
+    console.log('Running total: ' + beanService.runningTotal);
+}, false);
+
+document.getElementById('save').addEventListener('click', () => {
+    beanService.saveBalance();
+}, false);
+
+document.getElementById('load').addEventListener('click', () => {
+
+    beanService.loadBalance();
+}, false);
+
+/*
+// *************************************
+// ********  JUST FOR TESTING **********
+// *************************************
+
+function callWhenDone() {
+    debugAction.innerText = 'transaction logged';
+}
+
+
+const dumbdata = [
+    {name: "John", age: 34},
+    {name: "Katy", age: 44},
+    {name: "Ben", age: 4}
+    
+]
+
+function testing() {
+//     const templateHtml = `
+//   <div class="ledgerrow" id="ledgerrow">
+//     <span id="name">${age ?? -1}</span>
+//     <span id="age">${name ?? "John Doe"}</span>
+//   </div>;`
+    
+//   const rowTemplate = new HTMLHtmlElement().createElement();
+//   const rowCreator = document.createElement(newHtml);
+    
+    dumbdata.forEach((dummy) => {
+        // const pad = document.createElement('div');
+        // const pad = document.
+        // console.log('Processing ' + dummy.name);
+        // pad.innerText = `${dummy.name}\t\t\t---\t\t\t${dummy.age}`;
+        const newHtml = `
+  <div class="ledgerrow" id="ledgerrow">
+    <span id="name">${dummy.name}</span>
+    <span id="age">${dummy.age}</span>
+  </div>`;
+
+        ledgerAnchor.insertAdjacentHTML("beforeend", newHtml);
+
+    })
+    console.log('in testing function');
+}
+
+beanService.ledger.renderLedger();
+*/

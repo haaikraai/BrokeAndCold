@@ -11,6 +11,11 @@
     }
 }
 
+.top-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
 .content-row {
     display: flex;
     flex-direction: column;
@@ -112,4 +117,28 @@
     /* align-self: flex-end; */
     width: 50px;
     margin: 5px;
+}
+
+#ledgerrow {
+    display: grid;
+    grid-template-columns: 90px auto 60px;
+    height: 35px;
+}
+
+.ledgercell {
+    border: 1px solid darkgray;
+    padding: 3px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 1.1em;
+    text-align: left;
+    /* height: 30px; */
+    /* height: 120px; */
+}
+.amountcell {
+    text-align: right;
+}
+.datecell {
+    font-size: 0.8em;
+    line-height: 0.9em;
 }
