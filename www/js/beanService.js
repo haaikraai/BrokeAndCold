@@ -1,6 +1,9 @@
 // document.addEventListener('DOMContentLoaded', function() {};
 console.log('beanService.mjs');
 
+
+
+
 const debugAction = document.getElementById('action');
 const lastDate = document.getElementById('lastDate');
 
@@ -15,6 +18,9 @@ let logEntryTemplate =
  * @class BeanService
  */
 class BeanService {
+
+    literallyCounting = 0;
+
     /**
      * @type {Object}
      * @desciption current balance and settings as a json object
@@ -47,22 +53,23 @@ class BeanService {
 
 
     // timeBeforeNewTransaction = 3500;
-    timeBeforeNewTransaction = 18500;
-    runningTotal = -99;
+    timeBeforeNewTransaction = 3500;
+    runningTotal = -9;
     // VERY fine tuning: the milliseconds to elapse before allowing a click to be registered to a new transaction
     clickTimer;
     ledger = new ledgerBook();
 
     testButton = document.querySelector('#testButton')
+    balanceTag = document.querySelector('#balnace');
 
     constructor() {
-
+        this.literallyCounting += 1;
+        console.log(`There is now ${this.literallyCounting} beans`);
         console.log('BeanService constructor');
         console.log(this.balanceData);
         this.balance = this.balanceData.balance;
-        this.updateBalance();
         console.log('balance', this.balance);
-        
+        this.updateBalance();
        
         this.clickTimer = new eventTimer(this.timeBeforeNewTransaction, () => {
             console.log('should display cordially that amount added was: ' + this.runningTotal);
@@ -75,17 +82,22 @@ class BeanService {
         })
 
 
+        // debugAction.textContent = 'Will update in 6s\t' + this.balance.toString();
+        setTimeout(() => {
+            lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
+            // this.loadBalance();
+            this.updateDate();
+            this.updateBalance();
+            // debugAction.textContent = 'Updated balance from saved file';
+    
+            this.saveBalance("Loaded balance from saved file and applied daily allowances");
+    
+        }, 5000);
+    }
 
-        debugAction.textContent = 'Will update in 6s\t' + this.balance.toString();
-        lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
-
-        this.loadBalance();
-        this.updateDate();
-        this.updateBalance();
-        // debugAction.textContent = 'Updated balance from saved file';
-
-        this.saveBalance();
-
+    testInstance() {
+        console.log('Testing beanService');
+        console.log(this.balanceData);
     }
 
     increment() {
@@ -104,8 +116,7 @@ class BeanService {
 
     updateBalance() {
         this.balance += this.runningTotal;
-        const balanceTag = document.getElementById('balnace');
-        balanceTag.textContent = this.balance;
+        this.balanceTag.innerText = this.balance;
         debugAction.innerText = 'Updated balance by: ' + this.runningTotal;
         this.runningTotal = 0;
     }
@@ -123,10 +134,8 @@ class BeanService {
         logEntryTemplate.date = Date.now();
 
         this.logData.push(logEntryTemplate);
-        
 
-
-        debugAction.textContent = 'Saved balance' + msg;
+        debugAction.textContent = 'Saved balance: '+ this.balance.toString() + '---' + msg;
         lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
 
     }
@@ -137,9 +146,8 @@ class BeanService {
         if (parsedData) this.balanceData = parsedData;
         this.balance = this.balanceData.balance;
         console.log('Loaded: ', this.balanceData);
-        this.updateBalance();
 
-        debugAction.textContent = 'Loaded balance';
+        // debugAction.textContent = 'Loaded balance: '+ this.balance.toString();
         lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
     }
 
@@ -157,13 +165,15 @@ class BeanService {
         // get time difference between now and last saved in milliseconds, hours, days.
         const deltaTime = today.getTime() - loadedDate.getTime();
         const deltaHours = Math.floor(deltaTime / 1000/60/60);
-        const deltaDays = Math.floor(deltaHours / 24);
+        const deltaDays = Math.floor(deltaTime/1000/60/60/24);
         
-        
+        console.log('Calculations:');
+        console.log(deltaTime + ' - ' + deltaHours + ' - ' + deltaDays);
 
         // SAVE backup if more than 24 hours passed:
         if (deltaHours >= 24) {
             window.localStorage.setItem('backup', window.localStorage.getItem('data'));
+            console.log('backed up data');
         }
 
         // use already calculated days ellapsed to get new balance
@@ -324,36 +334,33 @@ class ledgerBook {
 
 }
 
+// function onLoad() {
+//     console.log('in onload');
+//     document.addEventListener("deviceready", onDeviceReady, false);
+// }
 
-export const beanService  = new BeanService();
+// // device APIs are available
+// //
 
-function onLoad() {
-    console.log('in onload');
-    document.addEventListener("deviceready", onDeviceReady, false);
-}
-
-// device APIs are available
-//
-
-function onDeviceReady() {
-    document.addEventListener("pause", onPause, false);
-    document.addEventListener("resume", onResume, false);
-    beanService.renderLedger();
-    // document.addEventListener("menubutton", onMenuKeyDown, false);
-    // Add similar listeners for other events
-}
+// function onDeviceReady() {
+//     document.addEventListener("pause", onPause, false);
+//     document.addEventListener("resume", onResume, false);
+//     beanService.renderLedger();
+//     // document.addEventListener("menubutton", onMenuKeyDown, false);
+//     // Add similar listeners for other events
+// }
 
 
 
-function onPause(e) {
-    beanService.saveBalance();
-    debugAction.innerText = "Did save before pause";
-}
+// function onPause(e) {
+//     beanService.saveBalance();
+//     debugAction.innerText = "Did save before pause";
+// }
 
-function onResume(e) {
-    beanService.loadBalance();
-    debugAction.innerText = "Did load before resuming";
-}
+// function onResume(e) {
+//     beanService.loadBalance();
+//     debugAction.innerText = "Did load before resuming";
+// }
 
 // console.log('beanService', beanService);
 
@@ -365,33 +372,55 @@ function onResume(e) {
 //     console.log('decrement');
 // }
 
+function settingsClicked() {
+    console.log('yes, clocked a button. Well done');
+    // balanceDataCopy = JSON.parse(JSON.stringify(beans.balanceData));
+/*************  ✨ Codeium Command 🌟  *************/
+    // window.location.href='./settings.html' // this will cause a full page reload
+    // window.location.assign('./settings.html') // this will cause a full page reload
+    // window.location.replace('./settings.html') // this will cause a full page reload and not remember the previous page
+    // history.replaceState(beans.balanceData, "", "./index.html");
+    // history.pushState(balanceDataCopy, "", './settings.html') // this is the way to do a SPA navigation, it will not cause a full page reload and will remember the previous page
+    // window.localStorage.setItem('data', JSON.stringify(balanceDataCopy));
+    window.location.search
+    window.location.assign('./settings.html?data=' + JSON.stringify(beans.balanceData));
+/******  21cb7d48-6063-46cb-a3ea-3f884e28c03a  *******/
+}
 
 
 
+const beans  = new BeanService();
+let balanceDataCopy = JSON.parse(JSON.stringify(beans.balanceData));
+// const balanceData = beans.balanceData;
+
+export { debugAction };
+
+
+document.getElementById('settingsButton').addEventListener('click', settingsClicked);
 
 
 document.getElementById('plus').addEventListener('click', () => {
     console.log('plussed');
-    beanService.increment();
-    console.log(beanService.clickTimer.onClick());
-    console.log('Running total: ' + beanService.runningTotal);
+    beans.increment();
+    console.log(beans.clickTimer.onClick());
+    console.log('Running total: ' + beans.runningTotal);
     // console.log('plussed');
     // console.log(beanService);
 }, false);
 
 document.getElementById('minus').addEventListener('click', () => {
-    beanService.decrement();
-    console.log(beanService.clickTimer.onClick());
-    console.log('Running total: ' + beanService.runningTotal);
+    beans.decrement();
+    console.log(beans.clickTimer.onClick());
+    console.log('Running total: ' + beans.runningTotal);
 }, false);
 
 document.getElementById('save').addEventListener('click', () => {
-    beanService.saveBalance();
+    beans.saveBalance("Saving from button");
 }, false);
 
 document.getElementById('load').addEventListener('click', () => {
-
-    beanService.loadBalance();
+    console.log('loading balance by button');
+    beans.loadBalance();
 }, false);
 
 /*

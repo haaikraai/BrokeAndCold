@@ -8,15 +8,15 @@
   <!-- <script type="module" src="ionic.esm.js"></script> -->
   <!-- <script src=c"ionic.nomodule.js"></script> -->
   <link rel="stylesheet" href="./css/style.css">
-  <link rel="manifest" href="./manifest.json">
-  <script type="module" src="./js/beanService.mjs"></script>
+  <script type="module" src="./js/beanService.js"></script>
   <title>Broke And Cold</title>
 </head>
 
-<body class="container">
+<body class="container dark-mode">
   <div class="top-buttons">
-  <span class="settings-icon">
-    <button onclick="window.location.href='./settings.html'" type="button">
+  <span class="link-icon">
+    <button id="settingsButton" href="./settings.html">
+    <!-- <a id="settingsButton" nohref > -->
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect y="4" width="24" height="2" fill="#000" />
@@ -25,8 +25,8 @@
       </svg>
     </button>
   </span>
-  <span class="settings-icon">
-    <button onclick="window.location.href='./historylog.html'" type="button">
+  <span class="link-icon" id="historyButton">
+    <button href="./historylog.html">
       <svg  xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" width="24" height="24">
         <path
           d="M18.656.93,6.464,13.122A4.966,4.966,0,0,0,5,16.657V18a1,1,0,0,0,1,1H7.343a4.966,4.966,0,0,0,3.535-1.464L23.07,5.344a3.125,3.125,0,0,0,0-4.414A3.194,3.194,0,0,0,18.656.93Zm3,3L9.464,16.122A3.02,3.02,0,0,1,7.343,17H7v-.343a3.02,3.02,0,0,1,.878-2.121L20.07,2.344a1.148,1.148,0,0,1,1.586,0A1.123,1.123,0,0,1,21.656,3.93Z" />

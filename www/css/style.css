@@ -11,6 +11,50 @@
     }
 }
 
+/* DARK MODE */
+body.dark-mode {
+  background-color: black;
+  color: rgb(161, 161, 161);
+}
+
+body.dark-mode .textline {
+  color: white;
+}
+
+body.dark-mode .better-button {
+  background-color: rgb(37, 67, 67);
+  border: 9px ridge rgb(0, 0, 0);
+}
+
+body.dark-mode .better-button:hover {
+  background-color: rgb(0, 0, 0);
+  border: 9px ridge rgb(37, 67, 67);
+  color: rgb(163, 186, 186);
+}
+
+body.dark-mode .better-button:active {
+  background-color: rgb(0, 0, 0);
+  border: 9px ridge rgb(37, 67, 67);
+  color: rgb(163, 186, 186);
+}
+
+body.dark-mode .better-button.nosign-text {
+  background-color: rgb(37, 67, 67);
+  border: 9px ridge rgb(0, 0, 0);
+}
+
+body.dark-mode .better-button.nosign-text:hover {
+  background-color: rgb(0, 0, 0);
+  border: 9px ridge rgb(37, 67, 67);
+  color: rgb(163, 186, 186);
+}
+
+body.dark-mode .better-button.nosign-text:active {
+  background-color: rgb(0, 0, 0);
+  border: 9px ridge rgb(37, 67, 67);
+}
+
+
 .top-buttons {
     display: flex;
     justify-content: space-between;
@@ -54,6 +98,7 @@
     
     background-color: rgb(83, 142, 142);
     border: 9px ridge darkslategray;
+    border-radius: 10px;
     flex-grow: 0;
     flex-shrink: 1;
     /* margin: 0px;     */
@@ -86,9 +131,9 @@
     font-size: medium;
 }
 
-.settings-icon {
+.link-icon {
     color: white;
-    background:rgb(37, 67, 67);
+    /* background:rgb(37, 67, 67); */
 }
 
 .settings-form {
@@ -104,7 +149,7 @@
 .entry-row {
     display: grid;
     /* note last columns is empty spans to center the fucking thing */
-    grid-template-columns: 200px 50px 150px;
+    grid-template-columns: 200px 50px 300px;
 
     /* width: 200px; */
     border: 1px dashed red;
@@ -112,10 +157,10 @@
     text-align: right;
 }
 
-.numberbox {
-    /* justify-self: flex-end; */
-    /* align-self: flex-end; */
-    width: 50px;
+.inputbox {
+    align-self: flex-start;
+    text-align: right;
+    width: 120px;
     margin: 5px;
 }
 
@@ -141,4 +186,8 @@
 .datecell {
     font-size: 0.8em;
     line-height: 0.9em;
+}
+
+button:hover {
+    cursor: pointer;
 }

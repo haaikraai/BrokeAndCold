@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Broke And Cold Settings</title>
     <link rel="stylesheet" href="./css/style.css">
-    <script type="module" src="./js/settings.mjs"></script>
+    <script type="module" src="./js/settings.js"></script>
 </head>
 
-<body>
+<body class="dark-mode">
     <div class="container">
         <!-- Inserting the SVG back icon -->
         <div class="top-buttons">
-            <button type="button" onclick="window.history.back()">
+            <button onclick="window.history.back()" id="backButton" type="button" >
                 <img src="/img/back.svg" alt="back" width="24">
             </button>
         </div>
@@ -26,30 +26,29 @@
 
                 <div class="entry-row">
 
-                    <label for="balanceAmt">Balance: </label>
-                    <input class="numberbox" id="balanceAmt" type="number">
+                    <label for="balanceAmt">Balance: </label><input class="inputbox" id="balanceAmt" type="number">
                     <span></span>
                 </div>
                 <div class="entry-row">
 
-                    <label for="dailyAmt">Daily Change: </label><input class="numberbox" id="dailyAmt" type="number">
+                    <label for="dailyAmt">Daily Change: </label><input class="inputbox" id="dailyAmt" type="number">
                     <span></span>
                 </div>
                 <div class="entry-row">
 
-                    <label for="increaseAmt">Increase Amount: </label><input class="numberbox" id="increaseAmt"
+                    <label for="increaseAmt">Increase Amount: </label><input class="inputbox" id="increaseAmt"
                         type="number">
                     <span></span>
                 </div>
                 <div class="entry-row">
 
-                    <label for="decreaseAmt">Decrease Amount: </label><input class="numberbox" id="decreaseAmt"
+                    <label for="decreaseAmt">Decrease Amount: </label><input class="inputbox" id="decreaseAmt"
                         type="number">
                     <span></span>
                 </div>
                 <div class="entry-row">
 
-                    <label for="lastDate">Last Date to Save: </label><input class="numberbox" id="date" type="date">
+                    <label for="lastDate">Last Date to Save: </label><input class="inputbox" id="date" type="date">
                     <span></span>
                 </div>ss
             </div>
