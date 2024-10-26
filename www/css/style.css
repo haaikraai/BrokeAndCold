@@ -1,12 +1,24 @@
+.container {
+    /* align-items: center; */
+    width: 70%;
+    /* very specific for my phone */
+    /* width:  300px; */
+    margin: auto;
+    border: 5px groove lightgrey;
+    padding: 17px;
+    /* flex-basis: 70%; */
+}
+
+
 @media screen and (max-width: 600px) {
     .container {
         /* align-items: center; */
-        width: 90%;
+        width: 85%;
         /* very specific for my phone */
-        width:  300px;
+        /* width:  300px; */
         margin: auto;
-        border: 4px groove lightgrey;
-        padding: 4px;
+        border: 2px groove lightgrey;
+        padding: 8px;
         /* flex-basis: 70%; */
     }
 }
@@ -67,7 +79,7 @@ body.dark-mode .better-button.nosign-text:active {
     align-items: center;
     /* flex-basis: 50%; */
     margin: auto;
-    width: 70%;
+    width: 90%;
     border: 3px dashed green;
     padding: 4px;
     /* margin: 10px;  */
@@ -99,6 +111,7 @@ body.dark-mode .better-button.nosign-text:active {
     background-color: rgb(83, 142, 142);
     border: 9px ridge darkslategray;
     border-radius: 10px;
+    margin: 3px 8px;
     flex-grow: 0;
     flex-shrink: 1;
     /* margin: 0px;     */
@@ -142,15 +155,15 @@ body.dark-mode .better-button.nosign-text:active {
     /* flex-direction: row; */
     /* justify-content: space-around;    */
     /* align-items: end; */
-    width: 330px;
+    width: 95%  ;
     /* gap: 6px; */
 }
 
 .entry-row {
     display: grid;
     /* note last columns is empty spans to center the fucking thing */
-    grid-template-columns: 200px 50px 300px;
-
+    grid-template-columns: 150px 150px ;
+    margin: 3px auto;
     /* width: 200px; */
     border: 1px dashed red;
     /* width: 250px; */
@@ -160,7 +173,7 @@ body.dark-mode .better-button.nosign-text:active {
 .inputbox {
     align-self: flex-start;
     text-align: right;
-    width: 120px;
+    width: 150px;
     margin: 5px;
 }
 
@@ -168,14 +181,13 @@ body.dark-mode .better-button.nosign-text:active {
     display: grid;
     grid-template-columns: 90px auto 60px;
     height: 35px;
+    width: 100%;
 }
 
 .ledgercell {
     border: 1px solid darkgray;
-    padding: 3px;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 1.1em;
+    margin: 1px;
+    font-size: 0.8em;
     text-align: left;
     /* height: 30px; */
     /* height: 120px; */
@@ -184,8 +196,8 @@ body.dark-mode .better-button.nosign-text:active {
     text-align: right;
 }
 .datecell {
-    font-size: 0.8em;
-    line-height: 0.9em;
+    font-size: 0.7em;
+    line-height: 0.8em;
 }
 
 button:hover {

@@ -19,8 +19,9 @@
 
 // Wait for the deviceready event before using any of Cordova's device APIs.
 // See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
-import { debugAction } from './beanService.mjs';
-// import { beanService as bs } from './beanService.mjs';
+
+// import { debugAction } from './beanService.mjs';
+// imfireport { beanService as bs } from './beanService.mjs';
 
 
 document.addEventListener('deviceready', onDeviceReady, false);
@@ -29,21 +30,33 @@ document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
+    console.log('CORDOVA ACTIVATED');
 
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    document.getElementById('deviceready').classList.add('ready');
+    // document.getElementById('deviceready').classList.add('ready');
     // debugAction.textContent = 'Cordova ready';
 
     document.addEventListener('pause', ()=> {
         console.log('leaving shallow waters');
-        // bs.beanService.saveBalance();
+        beanService.saveBalance();
         debugAction.textContent = 'Paused after saving';
     }, false);
     
     document.addEventListener('resume', ()=> {
         console.log('returning to deep waters');
-        // bs.beanService.loadBalance();
-        debugAction.textContent = 'Resumed after loading';
+        // maybe redunant
+        
+        statusTag.textContent = 'Resuming after being away';
+        setTimeout(() => {
+            beanService.loadBalance();
+            statusTag.textContent = '';
+            debugAction.textContent = 'Resumed after loading';
+        }, 2000);
+        
+    }, false);
+
+    window.addEventListener('volumeupbutton', () => {
+        alert('volume up');
     }, false);
 }
 

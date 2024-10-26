@@ -13,9 +13,13 @@
     <div class="container">
         <!-- Inserting the SVG back icon -->
         <div class="top-buttons">
-            <button onclick="window.history.back()" id="backButton" type="button" >
-                <img src="/img/back.svg" alt="back" width="24">
-            </button>
+            <span>
+                <button onclick="window.history.back()" id="backButton" type="button">
+                    <img src="/img/back.svg" alt="back" width="24">
+                </button>
+            </span>
+            <span id="status-bar"></span>
+            <span id="right-side-padding"></span>
         </div>
 
         <div class="content-row">
@@ -26,33 +30,43 @@
 
                 <div class="entry-row">
 
-                    <label for="balanceAmt">Balance: </label><input class="inputbox" id="balanceAmt" type="number">
-                    <span></span>
+                    <label for="balanceAmt">Balance: </label><input class="inputbox" id="balanceAmt" type="number"
+                        inputmode="numeric">
+                    <!-- <span></span> -->
                 </div>
                 <div class="entry-row">
 
-                    <label for="dailyAmt">Daily Change: </label><input class="inputbox" id="dailyAmt" type="number">
-                    <span></span>
+                    <label for="dailyAmt">Daily Change: </label>
+                    <input class="inputbox" id="dailyAmt" type="number"
+                        inputmode="numeric">
+                    <!-- <span></span> -->
                 </div>
                 <div class="entry-row">
 
                     <label for="increaseAmt">Increase Amount: </label><input class="inputbox" id="increaseAmt"
                         type="number">
-                    <span></span>
+                    <!-- <span></span> -->
                 </div>
                 <div class="entry-row">
 
                     <label for="decreaseAmt">Decrease Amount: </label><input class="inputbox" id="decreaseAmt"
                         type="number">
-                    <span></span>
+                    <!-- <span></span> -->
+
                 </div>
                 <div class="entry-row">
 
                     <label for="lastDate">Last Date to Save: </label><input class="inputbox" id="date" type="date">
-                    <span></span>
-                </div>ss
+                    <!-- <span></span> -->
+                </div>
             </div>
         </div>
+
+        <h3 class="content-row nosign-text">Fucked up? Revert to backup</h3>
+        <div class="button-bar">
+            <button class="better-button nosign-text" id="backupButton" type="button">Load Backup</button>
+        </div>
+
 
     </div>
 

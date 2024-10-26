@@ -1,11 +1,17 @@
 // document.addEventListener('DOMContentLoaded', function() {};
+
 console.log('beanService.mjs');
+
+const modal = document.getElementById('modal');
+console.log(modal);
+
 
 
 
 
 const debugAction = document.getElementById('action');
 const lastDate = document.getElementById('lastDate');
+const statusTag = document.getElementById('status-bar');
 
 let logEntryTemplate =
 {
@@ -13,33 +19,33 @@ let logEntryTemplate =
     tags: [],
     amount: 0
 }
+
+let globalBalanceData = {
+    balance: 5,
+    date: new Date('2024-10-05'),
+    incAmount: 55,
+    decAmount: -5,
+    dailyAmount: 555
+}
 /**
  * 
  * @class BeanService
  */
 class BeanService {
 
-    literallyCounting = 0;
+    // literallyCounting = 0;
 
     /**
      * @type {Object}
      * @desciption current balance and settings as a json object
     */
     balanceData = {
-        balance: 0,
+        balance: -1,
         date: new Date('2024-09-16'),
-        incAmount: 100,
-        decAmount: -25,
-        dailyAmount: 250
+        incAmount: 33,
+        decAmount: -3,
+        dailyAmount: 333
     }
-
-    logData = [
-        {
-            date: new Date(),
-            tags: [],
-            amount: 0
-        }]
-
 
     /**
      * @type {number}
@@ -54,23 +60,23 @@ class BeanService {
 
     // timeBeforeNewTransaction = 3500;
     timeBeforeNewTransaction = 3500;
-    runningTotal = -9;
+    runningTotal = 0;
     // VERY fine tuning: the milliseconds to elapse before allowing a click to be registered to a new transaction
     clickTimer;
-    ledger = new ledgerBook();
+    ledger = new LedgerBook();
 
     testButton = document.querySelector('#testButton')
     balanceTag = document.querySelector('#balnace');
 
     constructor() {
-        this.literallyCounting += 1;
-        console.log(`There is now ${this.literallyCounting} beans`);
-        console.log('BeanService constructor');
-        console.log(this.balanceData);
+        // this.literallyCounting += 1;
+        // console.log(`There is now ${this.literallyCounting} beans`);
         this.balance = this.balanceData.balance;
-        console.log('balance', this.balance);
+        console.log('BeanService constructor. Hardcoded balance: ', this.balance);
+        console.log(this.balanceData);
+
         this.updateBalance();
-       
+
         this.clickTimer = new eventTimer(this.timeBeforeNewTransaction, () => {
             console.log('should display cordially that amount added was: ' + this.runningTotal);
             this.updateBalance();
@@ -78,21 +84,20 @@ class BeanService {
 
         this.testButton.addEventListener('click', () => {
             console.log(this.ledger);
-            this.ledger.renderLedger(2);
+            this.ledger.renderLedger(5);
         })
 
 
-        // debugAction.textContent = 'Will update in 6s\t' + this.balance.toString();
+        // Here is the actual constructor. Real version should have no setTimeout
         setTimeout(() => {
             lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
-            // this.loadBalance();
+            this.loadBalance();
             this.updateDate();
             this.updateBalance();
-            // debugAction.textContent = 'Updated balance from saved file';
-    
+            debugAction.textContent = 'Updated balance from saved file';
             this.saveBalance("Loaded balance from saved file and applied daily allowances");
-    
-        }, 5000);
+
+        }, 1500);
     }
 
     testInstance() {
@@ -105,6 +110,7 @@ class BeanService {
         console.log('BeanService increment');
         // console.log(this.balanceData);
         this.runningTotal += this.balanceData.incAmount;
+        statusTag.textContent = "Adding: " + this.runningTotal;
     }
 
     decrement() {
@@ -112,12 +118,21 @@ class BeanService {
         // this.balance -= this.balanceData.decAmount;
         console.log(this.balanceData.decAmount);
         this.runningTotal += this.balanceData.decAmount;
+        statusTag.textContent = "Subtracting: " + this.runningTotal;
     }
 
     updateBalance() {
         this.balance += this.runningTotal;
         this.balanceTag.innerText = this.balance;
         debugAction.innerText = 'Updated balance by: ' + this.runningTotal;
+        statusTag.textContent = "Transaction saved. Total: " + this.runningTotal;
+
+        // TODO: tags are temporary for now. Get real tags method. Also in wrong place, should only be after buttons were clicked
+        const tags = ['before', 'tags', 'implemented']
+        this.ledger.addEntry(this.runningTotal, Date.now(), tags);
+        console.log('Added entry:');
+        console.log(this.ledger.ledgerData[this.ledger.ledgerData.length - 1]);
+
         this.runningTotal = 0;
     }
 
@@ -130,20 +145,20 @@ class BeanService {
         console.log(data);
         // window.localStorage.setItem('balance', this.balance);
         window.localStorage.setItem('data', data);
-        logEntryTemplate.amount = this.balance;
-        logEntryTemplate.date = Date.now();
 
-        this.logData.push(logEntryTemplate);
-
-        debugAction.textContent = 'Saved balance: '+ this.balance.toString() + '---' + msg;
+        statusTag.textContent = 'Balance after transaction: ' + this.balance.toString() + '---' + msg;
+        setTimeout(() => statusTag.textContent = '', 3000);
         lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
-
     }
 
     loadBalance() {
         console.log('BeanService loadBalance');
         const parsedData = JSON.parse(window.localStorage.getItem('data'));
-        if (parsedData) this.balanceData = parsedData;
+        if (parsedData) { this.balanceData = parsedData }
+        else {
+            console.log('No data in localStorage')
+            statusTag.textContent = 'No data in localStorage';
+        };
         this.balance = this.balanceData.balance;
         console.log('Loaded: ', this.balanceData);
 
@@ -161,12 +176,12 @@ class BeanService {
         // const today = new Date();
         const today = new Date();
         const loadedDate = new Date(this.balanceData.date);
-        
+
         // get time difference between now and last saved in milliseconds, hours, days.
         const deltaTime = today.getTime() - loadedDate.getTime();
-        const deltaHours = Math.floor(deltaTime / 1000/60/60);
-        const deltaDays = Math.floor(deltaTime/1000/60/60/24);
-        
+        const deltaHours = Math.floor(deltaTime / 1000 / 60 / 60);
+        const deltaDays = Math.floor(deltaTime / 1000 / 60 / 60 / 24);
+
         console.log('Calculations:');
         console.log(deltaTime + ' - ' + deltaHours + ' - ' + deltaDays);
 
@@ -174,21 +189,25 @@ class BeanService {
         if (deltaHours >= 24) {
             window.localStorage.setItem('backup', window.localStorage.getItem('data'));
             console.log('backed up data');
+            statusTag.textContent = 'Backed up data';
+            setTimeout(() => statusTag.textContent = '', 3000);
         }
 
         // use already calculated days ellapsed to get new balance
         // Math.floor - do not want fractional salaries
-        
-        const bal = this.balanceData.balance + deltaDays * this.balanceData.dailyAmount;
-        console.log(`added income to bal. Total: ${bal} - for ${deltaDays} days ellapsed`);
-        this.balanceData.balance = bal;
-        this.balanceData.date = today;
-        this.balance = bal;
 
+        const totalIncome = deltaDays * this.balanceData.dailyAmount;
+        console.log(`added income to bal. Total: ${totalIncome} - for ${deltaDays} days ellapsed`);
+        this.balance = this.balance + totalIncome;
+        this.balanceData.date = today;
+        this.balanceData.balance = this.balance;
+
+        statusTag.textContent = `Added ${totalIncome} to balance`;
+        setTimeout(() => statusTag.textContent = '', 3000);
         debugAction.textContent = `Updated date with ${deltaDays} days`;
         lastDate.textContent = new Date(this.balanceData.date).toDateString();
     }
-    
+
     /*
     Old version calculation per constraints. New version just gets millisecond difference, calculates day difference from it and done.
     */
@@ -288,50 +307,132 @@ class eventTimer {
     }
 }
 
-
-class ledgerBook {
+class LedgerBook {
     ledgerData = [
         {
             date: new Date('07-15-2025'),
-            tags: ['some','stuff'],
+            tags: ['some', 'stuff'],
             amount: 690
         },
         {
             date: new Date('09-01-2025'),
-            tags: ['less','stuff'],
+            tags: ['less', 'stuff'],
             amount: 90
         }
     ]
 
-    constuctor() {}
+    constuctor() {
+        this.loadHistory();
+    }
 
 
-    renderLedger(maxitems = 2) {
+    loadHistory() {
+        const historyFromStorage = window.localStorage.getItem('history');
+        if (historyFromStorage) {
+            this.ledgerData = JSON.parse(historyFromStorage);
+        } else {
+            console.log('No history in localStorage');
+        }
+        statusTag(textContent = 'History loaded');
+        setTimeout(() => statusTag.textContent = '', 3000);
+    }
+
+    saveHistory() {
+        window.localStorage.setItem('history', JSON.stringify(this.ledgerData));
+        statusTag(textContent = 'History saved');
+        setTimeout(() => statusTag.textContent = '', 3000);
+    }
+
+    addEntry(amount, date, tags = null) {
+        if (!tags) {
+            tags = ['no', 'tags'];
+        }
+        this.ledgerData.push({ date: new Date(date).toLocaleString(), tags, amount });
+    }
+
+    renderLedger(maxitems = 5) {
         // make max larger when you have actual items
         console.log('rendering');
         const entrypoint = document.querySelector('#ledgerhistory');
 
-        for (let i = this.ledgerData.length - 1; i >= this.ledgerData.length - maxitems; i--) 
-        {
-            console.log(i);
+        // clear any old ledger still here
+        while (entrypoint.firstChild) {
+            entrypoint.removeChild(entrypoint.firstChild);
+        }
+
+        // check if there are actually maxitems to render. If not, render all
+        if (this.ledgerData.length < maxitems) {
+            maxitems = this.ledgerData.length;
+        }
+
+
+        for (let i = this.ledgerData.length - 1; i >= this.ledgerData.length - maxitems; i--) {
             const entry = this.ledgerData[i];
-            console.log(entry)
+            const entryHtml = document.createElement('div');
+            entryHtml.className = 'ledgercontainer';
+            entryHtml.id = "modal-trigger";
+            entryHtml.dataset.index = i;
+            entryHtml.innerHTML = `
+                <span class="ledgercell datecell">${entry.date.toLocaleString()}</span>
+                <span class="ledgercell" >${entry.tags.toString()}</span>
+                <span class="ledgercell amountcell" >${entry.amount}</span>
+            `;
 
-            // double divving?
-            const entryHtml = `
-            <div id="ledgerrow">
-                <span class="ledgercell datecell" id="date">${entry.date.toLocaleString()}</span>
-                <span class="ledgercell" id="tags">${entry.tags.toString()}</span>
-                <span class="ledgercell amountcell" id="amount">${entry.amount}</span>
-            </div>`
-
-            entrypoint.insertAdjacentHTML("beforeend",entryHtml);
+            const entryRow = entrypoint.appendChild(entryHtml);
+            // const ledgerRow = entrypoint.querySelector('.ledgercontainer:last-child');
 
 
+            entryRow.addEventListener('click', () => {
+                // Open the modal here
+                openModal(entry);
+            });
         }
     }
+}
 
+function openModal(entry) {
+    console.log(entry);
+    modal.style.display = 'block';
+    console.log('modal');
+    console.log(modal);
 
+    // TODO: FIX THIS. mthe modal.querySelector is not working. It returns null. Only date works. I think.
+    // Check if form elements are indeed part of the modal's DOM
+
+    const modDate = document.querySelector('#modal-date');
+    const modTags = modal.querySelector('#modal-tags');
+    const modAmount = document.querySelector('#modal-amount');
+
+    console.log({modDate, modTags, modAmount});
+
+    modDate.value = entry.date.toLocaleString();
+    modTags.value = entry.tags.toString();
+    modAmount.value = entry.amount;
+
+    // Add event listener to close button
+    modal.querySelector('#modal-close').addEventListener('click', () => {
+        modal.style.display = 'none'; // Hide the modal
+    });
+
+    modal.querySelector('#modal-save').addEventListener('click', () => {
+        
+        const currentEntry = {
+            date: new Date(modDate.value),
+            tags: modTags.value,
+            amount: modAmount.value
+        };
+        console.log('Going to be saving');
+        console.log(currentEntry);
+        // beanService.ledger.addEntry(currentEntry.amount, currentEntry.date, currentEntry.tags);
+        modal.style.display = 'none'; // Hide the modal 
+    })
+
+    // Add event listener to modal container (for clicking outside)
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none'; // Hide the modal
+        }
+    });
 }
 
 // function onLoad() {
@@ -375,29 +476,63 @@ class ledgerBook {
 function settingsClicked() {
     console.log('yes, clocked a button. Well done');
     // balanceDataCopy = JSON.parse(JSON.stringify(beans.balanceData));
-/*************  ✨ Codeium Command 🌟  *************/
+    /*************  ✨ Codeium Command 🌟  *************/
     // window.location.href='./settings.html' // this will cause a full page reload
     // window.location.assign('./settings.html') // this will cause a full page reload
     // window.location.replace('./settings.html') // this will cause a full page reload and not remember the previous page
     // history.replaceState(beans.balanceData, "", "./index.html");
     // history.pushState(balanceDataCopy, "", './settings.html') // this is the way to do a SPA navigation, it will not cause a full page reload and will remember the previous page
     // window.localStorage.setItem('data', JSON.stringify(balanceDataCopy));
-    window.location.search
+    // const classData = new URLSearchParams().
+    // window.location.search
     window.location.assign('./settings.html?data=' + JSON.stringify(beans.balanceData));
-/******  21cb7d48-6063-46cb-a3ea-3f884e28c03a  *******/
+    /******  21cb7d48-6063-46cb-a3ea-3f884e28c03a  *******/
 }
 
 
 
-const beans  = new BeanService();
-let balanceDataCopy = JSON.parse(JSON.stringify(beans.balanceData));
+const beans = new BeanService();
+const balanceDataCopy = JSON.parse(JSON.stringify(beans.balanceData));
 // const balanceData = beans.balanceData;
 
-export { debugAction };
+export { debugAction, balanceDataCopy, globalBalanceData };
 
 
 document.getElementById('settingsButton').addEventListener('click', settingsClicked);
 
+document.addEventListener('deviceready', onDeviceReady, false);
+
+function onDeviceReady() {
+    // Cordova is now initialized. Have fun!
+    console.log('CORDOVA ACTIVATED');
+
+    console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
+    // document.getElementById('deviceready').classList.add('ready');
+    // debugAction.textContent = 'Cordova ready';
+
+    document.addEventListener('pause', () => {
+        console.log('leaving shallow waters');
+        beans.saveBalance();
+        debugAction.textContent = 'Paused after saving';
+    }, false);
+
+    document.addEventListener('resume', () => {
+        console.log('returning to deep waters');
+        // maybe redunant
+
+        statusTag.textContent = 'Resuming after being away';
+        setTimeout(() => {
+            beans.loadBalance();
+            statusTag.textContent = '';
+            debugAction.textContent = 'Resumed after loading';
+        }, 3000);
+
+    }, false);
+
+    window.addEventListener('volumeupbutton', () => {
+        alert('volume up');
+    }, false);
+}
 
 document.getElementById('plus').addEventListener('click', () => {
     console.log('plussed');
@@ -422,6 +557,11 @@ document.getElementById('load').addEventListener('click', () => {
     console.log('loading balance by button');
     beans.loadBalance();
 }, false);
+
+document.getElementById('modal-trigger').addEventListener('click', (ev) => {
+    console.log('opening modal');
+    openModal(ev);
+});
 
 /*
 // *************************************

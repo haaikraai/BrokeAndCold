@@ -1,0 +1,82 @@
+PROXIES FOR STATE MANAGEMENT IF IT COMES TO THAT
+
+3- Attempt 2 - Proxy
+Okay, first attempt didn't work. Let's try to use proxies to help us deal with this assignation error.
+
+Hum? Proxy? Well, a Proxy object makes it possible to create an intermediary for another object and which can intercept and redefine certain fundamental operations for it.
+
+Enough chit-chat, let's get back to code! Let's change our state.js file to this:
+
+import { setupCounter } from "./counter";
+
+const handler = {
+  set: function (obj, prop, value) {
+    obj[prop] = value;
+    setupCounter(document.getElementById("counter"));
+    return true;
+  },
+};
+
+export const state = new Proxy(
+  {
+    counter: 0,
+  },
+  handler
+);
+
+export const actions = {
+  increment: () => {
+    state.counter++;
+  },
+  decrement: () => {
+    state.counter--;
+  },
+};
+And now, let's adapt our main.js file to match these changes:
+
+import "./style.css";
+import javascriptLogo from "./javascript.svg";
+import { setupCounter } from "./counter.js";
+import { Button } from "./button";
+import { actions, state } from "./state";
+
+const App = () => {
+  return `<div>
+    <a href="https://vitejs.dev" target="_blank">
+      <img src="/vite.svg" class="logo" alt="Vite logo" />
+    </a>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
+      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
+    </a>
+    <h1>Hello Vite!</h1>
+    <div class="card">
+      <p id="counter"></p>
+    </div>
+    <div id="buttons"></div> 
+  </div>`;
+};
+
+document.querySelector("#app").innerHTML = App();
+
+setupCounter(document.getElementById("counter"));
+Button("#buttons", "-", actions.decrement);
+Button("#buttons", "+", actions.increment);
+Slight change to App declaration to match our beloved React app structure 😅
+Let's see if it works... and ... it WORKS! 🎉
+
+That's it folks! We've implemented state management from scratch using JavaScript.
+
+There is a package developed around this proxy concept called Valtio which is available for JavaScript, React, and so on... feel free to check and star it on Github.
+
+Conclusion
+This was not a very shiny demonstration of the proxy potential as what we did is just incrementing and decrementing a counter, but if you want a more advanced use of it, here is a link to a todo project using the same concept.
+
+
+
+
+******************************************
+
+To grab modal.querySelector:
+If you're getting undefined when using modal.querySelector but getting the correct element when using document.querySelector, it's likely because the element you're trying to select is not a descendant of the modal element.
+
+When you use document.querySelector, you're searching the entire document for the element. But when you use modal.querySelector, you're only searching within the modal element and its descendants.
