@@ -2,3 +2,24 @@ TODO:
 
 1. Double save in case of mistake
 2. IndexDB history log
+
+
+Notes:
+1. Datalist for tag autocomplete (does partial matching). Does not replace input:
+```html
+<label for="myBrowser">Choose a browser from this list:</label>
+<input list="browsers" id="myBrowser" name="myBrowser" />
+<datalist id="browsers">
+  <option value="Chrome"></option>
+  <option value="Firefox"></option>
+  <option value="Opera"></option>
+  <option value="Safari"></option>
+  <option value="Microsoft Edge"></option>
+</datalist>
+```
+
+2. Dialog for modal. Open with js openModal(). Returns form results.
+
+3. When a DocumentFragment value is passed, Node.appendChild and similar methods move only the child nodes of that value into the target node. Therefore, it is usually preferable to attach event handlers to the children of a DocumentFragment, rather than to the DocumentFragment itself.
+DocumentFragment gotten from doc.querySelector('template').cloneNode
+Now appendChild() appends ONLY children, not template as well!

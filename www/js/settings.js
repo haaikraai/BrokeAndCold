@@ -7,11 +7,11 @@ console.log('and: ');
 // console.log(globalBalanceData);
 
 let balanceData = {
-    balance: -1,
-    date: new Date('2024-10-01'),
-    incAmount: 11,
-    decAmount: -1,
-    dailyAmount: 111
+    balance: 0,
+    date: new Date(),
+    incAmount: 0,
+    decAmount: 0,
+    dailyAmount: 0
 }
 
 const balance = document.getElementById('balanceAmt');
@@ -21,11 +21,7 @@ const decrease = document.getElementById('decreaseAmt');
 const date = document.getElementById('date');
 const statusTag = document.getElementById('status-bar');
 
-console.log('hard coded balanceData: ');
-console.log(balanceData);
-loadBalance();
-
-setTimeout(() => {
+function loadFromUrl() {
     console.log('No = load balance from urrl');
     // const urlData = new URL(window.location.href).searchParams
     const urlData = new URLSearchParams(window.location.search).get('data')
@@ -35,14 +31,11 @@ setTimeout(() => {
     // balanceData = JSON.parse(window.localStorage.getItem('data'));
     console.log('balanceData: ');
     console.log(balanceData);
+}
+// Instead of url, just grab balanceData from local storage where it is saved anyways. Not sure if best ofstate management techniques,k but eh.
+// Which happends in loadbalance  functions!!!
 
-    // Instead of url, just grab balanceData from local storage where it is saved anyways. Not sure if best ofstate management techniques,k but eh.
-    // Which happends in loadbalance  functions!!!
-    loadBalance();
-    // updateBalance();
-}, 3000);
-
-
+// updateBalance();
 
 
 // redundant, imported beanservice instance
@@ -55,7 +48,7 @@ setTimeout(() => {
 // }
 
 function debug() {
-    
+
     console.log('starting in 10 seconds');
     setTimeout(() => {
 
@@ -81,22 +74,32 @@ function saveBalance() {
     const data = JSON.stringify(balanceData);
     console.log(data);
     window.localStorage.setItem('data', data);
-    
-    
+
+    statusTag.textContent = 'Settings saved';
+    setTimeout(() => {
+        statusTag.textContent = '';
+    }, 3000);
+
+
 }
 
 // redundant, imported beanservice instance
 function loadBalance() {
-    console.log('entering values in settings');
+    const balanceData = JSON.parse(window.localStorage.getItem('data'));
+    console.log('entering values in settings as loaded from localStorage');
     console.log(balanceData);
 
     balance.value = balanceData.balance;
     daily.value = balanceData.dailyAmount;
     increase.value = balanceData.incAmount;
     decrease.value = balanceData.decAmount;
-    date.valueAsNumber = new Date(balanceData.date).valueOf();  
+    date.valueAsNumber = new Date(balanceData.date).valueOf();
 
     console.log('Loaded: ', balanceData);
+    statusTag.textContent = 'Settings loaded';
+    setTimeout(() => {
+        statusTag.textContent = '';
+    }, 3000);
 }
 
 // document.addEventListener('DOMContentLoaded', loadBalance, false) 
@@ -113,12 +116,8 @@ document.getElementById('backupButton').addEventListener('click', () => {
     loadBalance();
 })
 
-
-document.addEventListener('focusout', () => {
-    console.log('lost focus');
+document.addEventListener('change', () => {
     saveBalance();
-    statusTag.textContent = 'Settings saved';
-    setTimeout(() => {
-        statusTag.textContent = '';
-    }, 3000);
-}, false);
+}, false)
+
+loadBalance();

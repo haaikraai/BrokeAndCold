@@ -177,29 +177,48 @@ body.dark-mode .better-button.nosign-text:active {
     margin: 5px;
 }
 
-#ledgerrow {
-    display: grid;
-    grid-template-columns: 90px auto 60px;
-    height: 35px;
+.ledgercontainer {
+    display: table;
     width: 100%;
+    border-collapse: collapse;
+    border: 1px solid darkgray;
 }
 
-.ledgercell {
+.ledgerrow {
+    display: table-row;
     border: 1px solid darkgray;
-    margin: 1px;
-    font-size: 0.8em;
-    text-align: left;
-    /* height: 30px; */
-    /* height: 120px; */
+    height: 35px;
 }
+
+
 .amountcell {
     text-align: right;
+}
+.tagcell {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .datecell {
     font-size: 0.7em;
     line-height: 0.8em;
 }
 
+.ledgercell {
+    border: 1px solid darkgray;
+    /* margin: 1px; */
+    font-size: 0.8em;
+    text-align: left;
+    /* height: 30px; */
+    /* height: 120px; */
+}
+
 button:hover {
     cursor: pointer;
+}
+
+.responsive-form {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;   
 }

@@ -1,6 +1,7 @@
 /* Modal container styles */
 .modal {
-  display: none; /* Will hide by default later */
+  /* display none not needed for dialog. default is none */
+  /* display: none; 
   position: fixed; /* Stay in place */
   top: 0;
   left: 50%;

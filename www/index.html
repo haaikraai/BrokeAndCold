@@ -62,16 +62,23 @@
     <button class="better-button nosign-text" id="load" type="button">Load</button>
   </div>
   <div>Last 5 actions in log:</div>
-  <div class="ledgercontainer" id="ledgerhistory">
+  <table class="ledgercontainer" id="ledgerhistory">
+    <thead>
+      <th>Date</th>
+      <th>Tags</th>
+      <th>Amount</th>
+    </thead>
+    <tbody>
     <!-- <span id="date"></span>
     <span id="tags"></span>
     <span id="Amount"></span> -->
-  </div>
+    </tbody>
+  </table>
 
 
 
   <!-- Trigger button -->
-  <button id="modal-trigger">Open Modal</button>
+
   <button type="button" id="testButton">Just test</button>
 
 
@@ -87,31 +94,34 @@
  -->
 
   <!-- Modal container -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <h2>bleep edit</h2>
-      <!-- Modal content -->
-      <div class="settings-form">
-        <div class="entry-row">
-          <label>Date</label>
-          <input class="inputbox" type="date" id="modal-date">
+  <dialog>
+    <!-- <div id="modal" class="modal"> -->
+    <form method="dialog" id="modalForm" class="responsive-form">
+      <div class="modal-content">
+        <h2>bleep edit</h2>
+        <!-- Modal content -->
+        <div class="settings-form">
+          <div class="entry-row">
+            <label>Date</label>
+            <input class="inputbox" type="date" id="modal-date">
+          </div>
+          <div class="entry-row">
+            <label>Tags</label>
+            <input class="inputbox" type="text" id="modal-tags">
+          </div>
+          <div class="entry-row">
+            <label>Amount</label>
+            <input class="inputbox" type="number" id="modal-amount">
+          </div>
         </div>
-        <div class="entry-row">
-          <label>Tags</label>
-          <input class="inputbox" type="text" id="modal-tags">
-        </div>
-        <div class="entry-row">
-          <label>Amount</label>
-          <input class="inputbox" type="number" id="modal-amount">
+        <div class="button-bar">
+          <button type="submit" id="modal-save" class="better-button" formaction="dialog">Save</button>
+          <button type="button" id="modal-close" class="better-button">Cancel</button>
         </div>
       </div>
-      <div class="button-bar">
-        <button type="button" id="modal-save" class="better-button">Save</button>
-        <button type=button id="modal-close" class="better-button">Cancel</button>
-      </div>
-    </div>
-  </div>
-
+    </form>
+    <!-- </div> -->
+  </dialog>
 
 
   <script src="cordova.js"></script>
