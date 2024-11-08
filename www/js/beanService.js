@@ -1,10 +1,6 @@
 // document.addEventListener('DOMContentLoaded', function() {};
-
 console.log('beanService.mjs');
 const testButton = document.querySelector('#testButton')
-
-
-
 
 
 
@@ -49,18 +45,18 @@ class BeanService {
 
     // timeBeforeNewTransaction = 3500; Doubleclick time
     // VERY fine tuning: the milliseconds to elapse before allowing a click to be registered to a new transaction
-    timeBeforeNewTransaction = 1500;
+    timeBeforeNewTransaction = 2000;
     runningTotal = 0;
     clickTimer;
-    history = new LedgerBook();
+    logHistory = new LedgerBook();
 
-    
+
     balanceTag = document.querySelector('#balnace');
 
     constructor() {
         // this.literallyCounting += 1;
         // console.log(`There is now ${this.literallyCounting} beans`);
-       
+
         // console.log('BeanService constructor. Hardcoded balance: ', this.balance);
         // console.log(this.balanceData);
 
@@ -68,20 +64,30 @@ class BeanService {
         this.clickTimer = new eventTimer(this.timeBeforeNewTransaction, () => {
             console.log('should display cordially that amount added was: ' + this.runningTotal);
             this.updateBalance();
+            this.logHistory.addEntry(this.runningTotal, Date.now(), ['new','transaction','before','tags','added']);
+            console.log('Added entry:');
+            console.log(this.logHistory.ledgerData.at(-1));
+            this.runningTotal = 0;
         });
 
 
         // Here is the actual constructor. Real version should have no setTimeout
 
+        console.log('loading saaved data');
         this.loadBalance();
+        this.logHistory.loadHistory();
+        console.log(this.logHistory.ledgerData);
+        
 
         setTimeout(() => {
+            console.log('finished loading');
             lastDate.textContent = new Date(this.balanceData.date).toLocaleString();
             this.updateDate();
             this.updateBalance();
             debugAction.textContent = 'Updated balance from saved file';
             this.saveBalance("Loaded balance from saved file and applied daily allowances");
-        }, 1500);
+            this.logHistory.saveHistory();
+        }, 4500);
     }
 
     testInstance() {
@@ -105,19 +111,14 @@ class BeanService {
         statusTag.textContent = "Subtracting: " + this.runningTotal;
     }
 
-    updateBalance() {
-        this.balance += this.runningTotal;
+    // Uses runningTotal to update balance.
+    // TODO: should be a method of LedgerBook. Should also have a parameter for amount.
+    // Only function of this function is to update the balance display
+    updateBalance(amount = this.runningTotal) {
+        this.balance += amount;
         this.balanceTag.innerText = this.balance;
         debugAction.innerText = 'Updated balance by: ' + this.runningTotal;
         statusTag.textContent = "Transaction saved. Total: " + this.runningTotal;
-
-        // TODO: tags are temporary for now. Get real tags method. Also in wrong place, should only be after buttons were clicked
-        const tags = ['daily', 'allowance', 'addedimplemented']
-        this.history.addEntry(this.runningTotal, Date.now(), tags);
-        console.log('Added entry:');
-        console.log(this.history.ledgerData[this.history.ledgerData.length - 1]);
-
-        this.runningTotal = 0;
     }
 
     saveBalance(msg) {
@@ -129,6 +130,7 @@ class BeanService {
         console.log(data);
         // window.localStorage.setItem('balance', this.balance);
         window.localStorage.setItem('data', data);
+        
 
         statusTag.textContent = 'Balance after transaction: ' + this.balance.toString() + '---' + msg;
         setTimeout(() => statusTag.textContent = '', 3000);
@@ -146,7 +148,7 @@ class BeanService {
         };
 
         const parsedData = JSON.parse(window.localStorage.getItem('data'));
-        
+
         if (parsedData) {
             this.balanceData = parsedData
             statusTag.textContent = 'Loaded balance: ' + this.balanceData.balance;
@@ -207,7 +209,10 @@ class BeanService {
         lastDate.textContent = new Date(this.balanceData.date).toDateString();
 
         this.saveBalance('daily allowances');
-        this.history.addEntry(totalIncome, Date.now(), ['daily', 'allowance', 'paid', `${deltaDays}days`])
+        if (deltaDays > 0) {
+            this.updateBalance(this.balance);
+            this.addEntry(totalIncome, Date.now(), ['daily', 'allowance', 'paid', `${deltaDays} days`])
+        }
     }
 
     /*
@@ -333,19 +338,29 @@ class LedgerBook {
     }
 
 
-    constuctor() {
+    constructor() {
+        console.log('In LedgerBook constructor');
+        console.log(this.ledgerData);
         this.loadHistory();
+        console.log('done parsing');
+        console.log(this.ledgerData);
     }
 
 
     loadHistory() {
         const historyFromStorage = window.localStorage.getItem('history');
         if (historyFromStorage) {
-            this.ledgerData = JSON.parse(historyFromStorage);
-        } else {
+            console.log('returned');
+            console.log(this.ledgerdata);
+            this.ledgerData = JSON.parse(historyFromStorage, (key,value) => {
+                // console.log(key, '==>', value);
+                if (key === "date") return new Date(value);
+                else return value;
+        })} else {
             console.log('No history in localStorage');
         }
-        statusTag(textContent = 'History loaded');
+        console.log(this.ledgerData);
+        statusTag.textContent = 'History loaded';
         setTimeout(() => statusTag.textContent = '', 3000);
     }
 
@@ -357,18 +372,27 @@ class LedgerBook {
 
     addEntry(amount, date, tags = null) {
         if (!tags) {
-            tags = ['no', 'tags', 'v2'];
+            tags = ['no', 'tags', 'supplied'];
         }
+        if (this.ledgerData) {
         this.ledgerData.push({
             index: this.ledgerData.length,
             date: new Date(date),
             tags: tags,
             amount: amount
         });
+    } else {
+        this.ledgerData = [{
+            index: 0,
+            date: new Date(date),
+            tags: tags,
+            amount: amount
+        }];
+    }
         this.saveHistory();
     }
 
-    async renderLedger(maxitems = 5) {
+    renderLedger(maxitems = 8) {
         // make max larger when you have actual items
         console.log('rendering');
         /** @type {HTMLTableElement} */
@@ -383,22 +407,27 @@ class LedgerBook {
         if (this.ledgerData.length < maxitems) {
             maxitems = this.ledgerData.length;
         }
-
+        entrypoint.se
 
         for (let i = this.ledgerData.length - 1; i >= this.ledgerData.length - maxitems; i--) {
-            let entry = this.ledgerData[i];
-            
-            const entryRow = entrypoint.insertRow(0);
-            entryRow.classList.add(["ledgercontainer","modal-trigger"]);
+            const entry = this.ledgerData[i];
+            console.log('entry is:');
+            console.log(entry);
+
+            const entryRow = entrypoint.insertRow();
+            entryRow.classList.add(["ledgerrow", "modal-trigger"]);
             entryRow.dataset.index = i;
+
             const dateCell = entryRow.insertCell()
-            dateCell.classList.add(["ledgercell","datecell"]);
-            dateCell.textContent = entry.date.toLocaleString();
-            const tagsCell  = entryRow.insertCell();
-            tagsCell.classList.add(["ledgercell","tagcell"]);
+            dateCell.classList.add(["ledgercell", "datecell"]);
+            dateCell.textContent = new Date(entry.date).toLocaleDateString();
+
+            const tagsCell = entryRow.insertCell();
+            tagsCell.classList.add(["ledgercell", "tagcell"]);
             tagsCell.textContent = entry.tags.toString();
+            
             const amountCell = entryRow.insertCell();
-            amountCell.classList.add(["ledgercell","amountcell"]);
+            amountCell.classList.add(["ledgercell", "amountcell"]);
             amountCell.textContent = entry.amount;
 
             // entryHtml.innerHTML = `
@@ -413,149 +442,193 @@ class LedgerBook {
 
             console.log('entry now is before click listener: ');
             console.log(entry);
-            entryRow.addEventListener('click', async() => {
+
+            entryRow.addEventListener('click', (event) => {
+
+                const index = i;
+                const currentEntry = this.ledgerData[index];
+
                 // Open the modal here
-                console.log(entry);
-                console.log('will be sent to opening modal. Should return result');
+                console.log('will be sent theeese opening modal. Should return result');
+                console.log(index);                
+                console.log(currentEntry);
+
                 
-                const updatedEntry = await new Promise((resolve, reject) => {
-                    const modal = openModal(entry);
-                    modal.addEventListener('close', () => {
-                        resolve(modal.returnValue);
-                    });
-                    modal.addEventListener('error', (err) => {
-                        reject(err);
-                    });
+                
+                
+                // OPEN AND PROCESS MODAL HGERE, cause I suck with promises it seems. cliche mistake, but fuckit.
+                const modal = document.querySelector('dialog');
+                // can seriously initialize the whole modal and form first, eventListeners too, then just call modal.showModal()
+                let updatedEntry = {
+                    Number,
+                    Date,
+                    Array,
+                    Number
+                };
+        
+                updatedEntry = currentEntry;
+        
+                const modDate = modal.querySelector('#modal-date');
+                const modTags = modal.querySelector('#modal-tags');
+                const modAmount = modal.querySelector('#modal-amount');
+            
+                modDate.valueAsDate = entry.date;
+                modTags.value = entry.tags.toString(); // can use join too
+                modAmount.value = entry.amount.toString();
+            
+                const cancelButton = modal.querySelector('#modal-close');
+                const saveButton = modal.querySelector('#modal-save');
+            
+                cancelButton.addEventListener('click', () => {
+                    modal.close('cancelled');
                 });
+            
+                saveButton.addEventListener('click', () => {
+                    // check if entry is updated from HTML values
+                    console.log('will use this data:');
+                    console.log(entry);
+                    console.log('Tamper and save with this:');
+            
+                    // Every need to define return data here since only save should return update
+                    updatedEntry = {
+                        index: index,
+                        date: Date(modDate.valueAsNumber),
+                        tags: modTags.value.split(','),
+                        amount: modAmount.value
+                    };
+                    
+                    
+                    console.log(updatedEntry);
+                    this.ledgerData[i] = updatedEntry;
+                    this.saveHistory();
+                    modal.close('submitted');
+                });
+
+                modal.showModal();
+
+                // modal.addEventListener('close', () => {
+                //     console.log('in promises and liess');
                 
-                console.log('returned entry is: ');
-                console.log(updatedEntry);
-                //  DOES THIS WORK? otherwise entry should just this.ledgerData[i] or whatever.
-                entry = updatedEntry;
-                console.log('entry now is after click listener: ');
-                console.log(entry);
-                console.log('updating ledger row soon...');
+                //     console.log('modal closing');
+                //     if (modal.returnValue) {
+            
+                //         console.log('Form submitted. Returning form data:');
+                //         // get form data
+                //         const updatedEntry = {
+                //             index: entry.index,
+                //             date: Date.parse(modDate.value),
+                //             tags: modTags.value.split(','),
+                //             amount: parseInt(modAmount.value)
+                //         }
+                //         console.log(updatedEntry);
+                //         resolve(updatedEntry);
+            
+                //     } else {
+                //         console.log('Form canceled. Returning null');
+                //         reject('Form cancelled or closed without saving.');
+                //     }
+                // });
+            
+
+                // openModal(entry)
+                //     .then((update) => {
+                //         console.log('returned entry is: ');
+                //         console.log(update);
+                //         //  DOES THIS WORK? otherwise entry should just this.ledgerData[i] or whatever.
+                //         entry = update;
+                //         console.log('entry now is after click listener: ');
+                //         console.log(entry);
+                //         console.log('updating ledger row soon...');
+                //         return entry;
+                //     })
+                //     .catch((err) => {
+                //         console.log('did not submit, but still have entry in scope:');
+                //         console.log(err);
+                //         console.log(entry);
+                //         // redudnent yeah, but no changes:
+                //         entry = entry;
+                //         return entry;
+                //     })
+
+
+
+                // update json array here.
             });
         }
     }
-}
 
-async function openModal(entry) {
-    /**
-     * Opens a modal for editing a ledger entry
-     * @param {{ date: Date, tags: string[], amount: number }} entry - The ledger entry to be edited
-     * @returns {{ date: Date, tags: string[], amount: number }} The updated ledger entry
-     */
-    /**
-     * The modal element that will be used to edit ledger entries
-     * @constant {HTMLDialogElement}
-     */
-    const modal = document.querySelector('dialog');
-    
-    
-    console.log('Opening modal with entry: ');
-    console.log(entry);
-    
-    
-    // can seriously initialize the whole modal and form first, eventListeners too, then just call modal.showModal()
+    // NOT BEING USED DUDE
+    async openModal(entry) {
+        /**
+         * Opens a modal for editing a ledger entry
+         * @param {{ date: Date, tags: string[], amount: number }} entry - The ledger entry to be edited
+         * @returns {{ date: Date, tags: string[], amount: number }} The updated ledger entry
+         */
+        /**
+         * The modal element that will be used to edit ledger entries
+         * @constant {HTMLDialogElement}
+         */
+        const modal = document.querySelector('dialog');
+        // can seriously initialize the whole modal and form first, eventListeners too, then just call modal.showModal()
+        let updatedEntry = {
+            Number,
+            Date,
+            Array,
+            Number
+        };
 
-    const modDate = document.querySelector('#modal-date');
-    const modTags = modal.querySelector('#modal-tags');
-    const modAmount = document.querySelector('#modal-amount');
+        updatedEntry = entry;
 
+        const modDate = modal.querySelector('#modal-date');
+        const modTags = modal.querySelector('#modal-tags');
+        const modAmount = modal.querySelector('#modal-amount');
     
-    modDate.valueAsDate = entry.date;
-    modTags.value = entry.tags.toString(); // can use join too
-    modAmount.value = entry.amount.toString();
-
-    modal.addEventListener('close', () => {
-        console.log('modal closed');
-        if (modal.returnValue) {
-            console.log('Form submitted. Returning form data:');
-            // get form data
-            const updatedEntry = {
-                index: entry.index,
-                date: Date.parse(modDate.value),
-                tags: modTags.value.split(','),
-                amount: parseInt(modAmount.value)
-            }
+        modDate.value = entry.date.toDateString();
+        modTags.value = entry.tags.toString(); // can use join too
+        modAmount.value = entry.amount.toString();
+    
+        const cancelButton = modal.querySelector('#modal-close');
+        const saveButton = modal.querySelector('#modal-save');
+    
+        modal.addEventListener('close', () => {
+            console.log('modal being closed. returning:')
             console.log(updatedEntry);
+
+            // doens't want to async. I think. ha ha
+            // shitty style, but just gonna change it here
+            this.ledgerData[entry.index] = updatedEntry;
+            this.renderLedger();
+
+
             return updatedEntry;
-        }    
-    })
-
-    const cancelButton = modal.querySelector('#modal-close');
-    const saveButton = modal.querySelector('#modal-save');
+        })
     
-    cancelButton.addEventListener('click', () => {
-        modal.close();
-    });
+        cancelButton.addEventListener('click', () => {
+            modal.close('cancelled');
+        });
+    
+        saveButton.addEventListener('click', () => {
+            // check if entry is updated from HTML values
+            console.log('returning update');
+    
+            // Every need to define return data here since only save should return update
+            updatedEntry = {
+                index: entry.index,
+                date: Date.parse(modDate.valueAsDate),
+                tags: modTags.textContent.split(','),
+                amount: modAmount.value
+            };
 
-    saveButton.addEventListener('click', () => {
-        // check if entry is updated from HTML values
-        console.log('saving update');
+            console.log(updatedEntry);
+            modal.close('submitted');
+        });
 
-        // Every need to define return data here since only save should return update
-        const currentEntry = {
-            index: entry.index,
-            date: Date.parse(modDate.valueAsDate),
-            tags: modTags.textContent.split(','),
-            amount: modAmount.value
-        };
-        console.log(currentEntry);
-        modal.close(currentEntry); 
-    });
-
-    modal.showModal();
-
-}
-
-// WARNING NOT IN USE NO MORE
-function spopenModalOld(entry) {
-    console.log(entry);
-    modal.style.display = 'block';
-    console.log('modal');
-    console.log(modal);
-
-    // TODO: FIX THIS. mthe modal.querySelector is not working. It returns null. Only date works. I think.
-    // Check if form elements are indeed part of the modal's DOM
-
-    const modDate = document.querySelector('#modal-date');
-    const modTags = modal.querySelector('#modal-tags');
-    const modAmount = document.querySelector('#modal-amount');
-
-    console.log({modDate, modTags, modAmount});
-
-    modDate.value = entry.date.toLocaleString();
-    modTags.value = entry.tags.toString();
-    modAmount.value = entry.amount;
-
-    // Add event listener to close button
-    modal.querySelector('#modal-close').addEventListener('click', () => {
-        modal.style.display = 'none'; // Hide the modal
-    });
-
-    modal.querySelector('#modal-save').addEventListener('click', () => {
         
-        const currentEntry = {
-            index: entry.index,
-            date: new Date(modDate.value),
-            tags: modTags.value,
-            amount: modAmount.value
-        };
-        console.log('Going to be saving');
-        console.log(currentEntry);
-        // beanService.ledger.addEntry(currentEntry.amount, currentEntry.date, currentEntry.tags);
-        modal.style.display = 'none'; // Hide the modal 
-        return currentEntry;
-    })
+    
+        modal.showModal();
+    }
+    
 
-    // Add event listener to modal container (for clicking outside)
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none'; // Hide the modal
-        }
-    });
 }
 
 // function onLoad() {
@@ -608,6 +681,7 @@ function settingsClicked() {
     // window.localStorage.setItem('data', JSON.stringify(balanceDataCopy));
     // const classData = new URLSearchParams().
     // window.location.search
+    beans.saveBalance();
     window.location.assign('./settings.html?data=' + JSON.stringify(beans.balanceData));
     /******  21cb7d48-6063-46cb-a3ea-3f884e28c03a  *******/
 }
@@ -687,8 +761,8 @@ document.getElementById('load').addEventListener('click', () => {
 }, false);
 
 testButton.addEventListener('click', () => {
-    console.log(beans.history);
-    beans.history.renderLedger(8);
+    console.log(beans.logHistory);
+    beans.logHistory.renderLedger(8);
 })
 
 

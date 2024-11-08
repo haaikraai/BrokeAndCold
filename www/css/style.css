@@ -184,6 +184,13 @@ body.dark-mode .better-button.nosign-text:active {
     border: 1px solid darkgray;
 }
 
+.theaders {
+    display: table-header-group;
+    background-color: rgb(37, 67, 67);
+    color: white;
+    border: 1px solid darkgray;
+}
+
 .ledgerrow {
     display: table-row;
     border: 1px solid darkgray;
@@ -195,6 +202,7 @@ body.dark-mode .better-button.nosign-text:active {
     text-align: right;
 }
 .tagcell {
+    font-size: 0.6em;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -204,6 +212,7 @@ body.dark-mode .better-button.nosign-text:active {
 }
 
 .ledgercell {
+    display: table-cell;
     border: 1px solid darkgray;
     /* margin: 1px; */
     font-size: 0.8em;

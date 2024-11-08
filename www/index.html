@@ -13,6 +13,7 @@
 </head>
 
 <body class="container dark-mode">
+<!-- <body class="container"> -->
   <div class="top-buttons">
     <span class="link-icon">
       <button id="settingsButton" href="./settings.html">
@@ -62,8 +63,10 @@
     <button class="better-button nosign-text" id="load" type="button">Load</button>
   </div>
   <div>Last 5 actions in log:</div>
+  
+  
   <table class="ledgercontainer" id="ledgerhistory">
-    <thead>
+    <thead class="theaders">
       <th>Date</th>
       <th>Tags</th>
       <th>Amount</th>
@@ -115,7 +118,7 @@
           </div>
         </div>
         <div class="button-bar">
-          <button type="submit" id="modal-save" class="better-button" formaction="dialog">Save</button>
+          <button type="submit" id="modal-save" class="better-button">Save</button>
           <button type="button" id="modal-close" class="better-button">Cancel</button>
         </div>
       </div>

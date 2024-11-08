@@ -116,7 +116,7 @@ document.getElementById('backupButton').addEventListener('click', () => {
     loadBalance();
 })
 
-document.addEventListener('change', () => {
+document.addEventListener('input', () => {
     saveBalance();
 }, false)
 
