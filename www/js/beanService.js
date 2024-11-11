@@ -45,7 +45,8 @@ class BeanService {
 
     // timeBeforeNewTransaction = 3500; Doubleclick time
     // VERY fine tuning: the milliseconds to elapse before allowing a click to be registered to a new transaction
-    timeBeforeNewTransaction = 2000;
+    // timeBeforeNewTransaction = 2000;
+					IDLE_THRESHOLD = 3500;
     runningTotal = 0;
     clickTimer;
     logHistory = new LedgerBook();
@@ -61,7 +62,7 @@ class BeanService {
         // console.log(this.balanceData);
 
 
-        this.clickTimer = new eventTimer(this.timeBeforeNewTransaction, () => {
+        this.clickTimer = new eventTimer(this.IDLE_THRESHOLD, () => {
             console.log('should display cordially that amount added was: ' + this.runningTotal);
             this.updateBalance();
             this.logHistory.addEntry(this.runningTotal, Date.now(), ['new','transaction','before','tags','added']);
@@ -87,7 +88,7 @@ class BeanService {
             debugAction.textContent = 'Updated balance from saved file';
             this.saveBalance("Loaded balance from saved file and applied daily allowances");
             this.logHistory.saveHistory();
-        }, 4500);
+        }, 1500);
     }
 
     testInstance() {
@@ -116,8 +117,8 @@ class BeanService {
     // Only function of this function is to update the balance display
     updateBalance(amount = this.runningTotal) {
         this.balance += amount;
-        this.balanceTag.innerText = this.balance;
-        debugAction.innerText = 'Updated balance by: ' + this.runningTotal;
+        this.balanceTag.textContent = this.balance;
+        debugAction.textContent = 'Updated balance by: ' + this.runningTotal;
         statusTag.textContent = "Transaction saved. Total: " + this.runningTotal;
     }
 
