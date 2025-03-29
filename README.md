@@ -1,0 +1,1 @@
+Native version to be. For now, the hybrid app version must suffice. See https://github.com/haaikraai/brokeandcold-ng
